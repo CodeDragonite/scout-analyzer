@@ -1,0 +1,102 @@
+{
+  "name": "Scouting Analyzer",
+  "version": 1,
+  "color": {
+    "themes": [
+      { "id": "dark", "name": "Film room (dark)" },
+      { "id": "light", "name": "Daylight (light)" }
+    ],
+    "tokens": [
+      { "name": "bg", "value": { "dark": "#0e1113", "light": "#f5f6f3" }, "usage": "App and page background. The film room: near-black with a cool turf tint, never pure #000." },
+      { "name": "surface-1", "value": { "dark": "#161a1d", "light": "#ffffff" }, "usage": "Panels, cards, tag form, play list rail." },
+      { "name": "surface-2", "value": { "dark": "#1e2327", "light": "#eef0ec" }, "usage": "Inputs, table header rows, hovered rows, chip backgrounds." },
+      { "name": "surface-3", "value": { "dark": "#283036", "light": "#e1e5df" }, "usage": "Pressed / selected neutral states, kbd keycaps." },
+      { "name": "video-well", "value": { "dark": "#050607", "light": "#0e1113" }, "usage": "Letterbox behind every video player. Stays dark in both themes so footage reads the same." },
+      { "name": "border", "value": { "dark": "#2c353b", "light": "#d4d9d2" }, "usage": "Hairlines between rows, panel edges, default input borders." },
+      { "name": "border-strong", "value": { "dark": "#66737d", "light": "#8e988f" }, "usage": "Input borders on hover, dividers that must survive projection; 3:1 against surface-1 in both themes." },
+      { "name": "ink", "value": { "dark": "#eef1ee", "light": "#12161a" }, "usage": "Primary text on bg and surfaces." },
+      { "name": "ink-muted", "value": { "dark": "#a1abb2", "light": "#4f5a63" }, "usage": "Secondary text, labels, table meta. Passes 4.5:1 on surface-1 and surface-2 in both themes." },
+      { "name": "ink-faint", "value": { "dark": "#76818a", "light": "#6f7a83" }, "usage": "Placeholders, disabled text, timestamps at 12px+. Only for non-essential text (≈4.5:1 on bg, lower on surface-2)." },
+      { "name": "accent", "value": { "dark": "#ff7a1a", "light": "#c2410c" }, "usage": "Down-marker orange. Primary actions, the current play, selection, focus fill. The ONE token a team color replaces." },
+      { "name": "accent-hover", "value": { "dark": "#ff9447", "light": "#a8370a" }, "usage": "Hover state of accent fills." },
+      { "name": "accent-ink", "value": { "dark": "#1a0c02", "light": "#ffffff" }, "usage": "Text and icons on accent fills. Recomputed when a team color is applied (black or white, whichever passes 4.5:1)." },
+      { "name": "accent-soft", "value": { "dark": "#3a2210", "light": "#fde8d7" }, "usage": "Tinted background for the selected play row and active filter chips." },
+      { "name": "accent-text", "value": { "dark": "#ff9a52", "light": "#b23c0b" }, "usage": "Accent-colored text on bg/surfaces (links, active tab labels)." },
+      { "name": "focus-ring", "value": { "dark": "#ffb27a", "light": "#c2410c" }, "usage": "2px focus outline on every focusable element. Keyboard-first product: never suppressed." },
+      { "name": "play-run", "value": { "dark": "#7fd99a", "light": "#1d7a43" }, "usage": "Run plays in chips, bars and charts. Light green, lighter than pass so the pair also splits by lightness." },
+      { "name": "play-pass", "value": { "dark": "#4f8ff0", "light": "#2a62c2" }, "usage": "Pass plays. Mid blue." },
+      { "name": "play-rpo", "value": { "dark": "#c39bff", "light": "#7440c9" }, "usage": "RPO plays. Violet." },
+      { "name": "play-screen", "value": { "dark": "#3cc8c0", "light": "#0b7a74" }, "usage": "Screens / quick game to the perimeter. Teal." },
+      { "name": "play-special", "value": { "dark": "#e8c94d", "light": "#876a00" }, "usage": "Special teams. Gold." },
+      { "name": "success", "value": { "dark": "#4fc27c", "light": "#1d7a43" }, "usage": "Positive result, processed, availability OK, gain of yards." },
+      { "name": "warning", "value": { "dark": "#f0b43c", "light": "#9a6200" }, "usage": "Suggested (unconfirmed) tags, YouTube source at risk, processing." },
+      { "name": "danger", "value": { "dark": "#f26363", "light": "#c42b2b" }, "usage": "Errors, turnovers, negative plays, destructive actions." },
+      { "name": "field", "value": { "dark": "#1c3a29", "light": "#2e6a45" }, "usage": "Turf green for field-position strips and the cover. Never a page background." },
+      { "name": "field-line", "value": { "dark": "#e8efe9", "light": "#ffffff" }, "usage": "Yard lines and hash marks drawn on field." },
+      { "name": "overlay", "value": { "dark": "#000000b3", "light": "#12161a80" }, "usage": "Modal scrim. Never over a YouTube player area." }
+    ]
+  },
+  "type": {
+    "fonts": [],
+    "families": {
+      "display": "\"Barlow Condensed\", \"Oswald\", \"Arial Narrow\", sans-serif",
+      "sans": "\"Inter\", system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "mono": "\"JetBrains Mono\", ui-monospace, \"SFMono-Regular\", Menlo, monospace"
+    },
+    "groups": [
+      {
+        "name": "Display",
+        "family": "display",
+        "styles": [
+          { "name": "display-xl", "fontSize": "64px", "lineHeight": 0.95, "fontWeight": 700, "letterSpacing": "-0.01em", "sample": "Break down any film.", "usage": "Marketing hero only." },
+          { "name": "display-l", "fontSize": "40px", "lineHeight": 1, "fontWeight": 700, "sample": "Trey Rt, 3rd & 4–6", "usage": "Page titles in the app, opponent name on the print sheet." },
+          { "name": "display-m", "fontSize": "26px", "lineHeight": 1.05, "fontWeight": 600, "sample": "Week 9, Central High", "usage": "Section titles, panel headers on report pages." },
+          { "name": "stat", "fontSize": "34px", "lineHeight": 1, "fontWeight": 700, "sample": "70%", "usage": "Big percentages and counts in tendency tiles. Tabular figures." },
+          { "name": "down-distance", "fontSize": "20px", "lineHeight": 1, "fontWeight": 700, "sample": "3 & 5", "usage": "Down & distance badge in the breakdown screen and play list." }
+        ]
+      },
+      {
+        "name": "Text",
+        "family": "sans",
+        "styles": [
+          { "name": "heading", "fontSize": "16px", "lineHeight": "22px", "fontWeight": 600, "sample": "Tag this play", "usage": "Panel and card headings in the app." },
+          { "name": "body", "fontSize": "14px", "lineHeight": "20px", "fontWeight": 400, "sample": "Paste a YouTube link or import from Drive.", "usage": "Default UI text." },
+          { "name": "body-s", "fontSize": "13px", "lineHeight": "18px", "fontWeight": 400, "sample": "Q2, 07:41, left hash", "usage": "Table cells, play list meta, dense panels." },
+          { "name": "label", "fontSize": "12px", "lineHeight": "16px", "fontWeight": 500, "sample": "Personnel", "usage": "Field labels and column headers. Sentence case, never all caps." },
+          { "name": "marketing-lead", "fontSize": "19px", "lineHeight": "28px", "fontWeight": 400, "sample": "Phone video from the stands is enough.", "usage": "Landing page lead paragraphs." }
+        ]
+      },
+      {
+        "name": "Mono",
+        "family": "mono",
+        "styles": [
+          { "name": "timecode", "fontSize": "12px", "lineHeight": "16px", "fontWeight": 500, "sample": "00:41:07.20", "usage": "Clip start/end, video timecodes, hotkey legends." }
+        ]
+      }
+    ]
+  },
+  "spacing": {
+    "tokens": [
+      { "name": "space-1", "value": "4px", "usage": "Icon-to-label gap, chip inner gap." },
+      { "name": "space-2", "value": "8px", "usage": "Inside compact controls, play row vertical padding." },
+      { "name": "space-3", "value": "12px", "usage": "Form field gaps, list item padding." },
+      { "name": "space-4", "value": "16px", "usage": "Panel padding, mobile side gutter." },
+      { "name": "space-6", "value": "24px", "usage": "Gap between panels on the breakdown screen." },
+      { "name": "space-8", "value": "32px", "usage": "Section spacing in reports and settings." },
+      { "name": "space-12", "value": "48px", "usage": "Marketing section rhythm." }
+    ]
+  },
+  "radius": {
+    "tokens": [
+      { "name": "radius-sm", "value": "4px", "usage": "Chips, kbd caps, small badges." },
+      { "name": "radius-md", "value": "6px", "usage": "Buttons, inputs, play rows." },
+      { "name": "radius-lg", "value": "10px", "usage": "Panels, cards, modals, video frame." },
+      { "name": "radius-pill", "value": "999px", "usage": "Filter pills, avatars, status dots." }
+    ]
+  },
+  "shadow": {
+    "tokens": [
+      { "name": "shadow-pop", "value": { "dark": "0 12px 32px #00000080", "light": "0 12px 32px #12161a26" }, "usage": "Menus, command palette, hotkey cheat sheet. Panels use borders, not shadows." }
+    ]
+  }
+}
