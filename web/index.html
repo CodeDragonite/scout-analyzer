@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scout Analyzer — M0 spike</title>
+  </head>
+  <body>
+    <div id="app" tabindex="-1">
+      <header class="top">
+        <h1 data-i18n="app.title"></h1>
+        <form id="source" class="source">
+          <label class="sr" for="url" data-i18n="source.label"></label>
+          <input id="url" type="text" autocomplete="off" data-i18n-placeholder="source.placeholder" />
+          <button type="submit" class="btn" data-i18n="source.load"></button>
+          <label class="btn" for="file" data-i18n="source.openFile"></label>
+          <input id="file" type="file" accept="video/*" class="sr" />
+        </form>
+        <div class="tools">
+          <button id="help" class="btn ghost"><kbd>?</kbd> <span data-i18n="keys.title"></span></button>
+          <div class="lang" role="group" data-i18n-aria="lang.label">
+            <button id="lang-en" type="button">EN</button><button id="lang-es" type="button">ES</button>
+          </div>
+        </div>
+      </header>
+      <div id="banner" role="status" aria-live="polite"></div>
+      <main class="grid">
+        <aside class="rail">
+          <h2 data-i18n="rail.title"></h2>
+          <ol id="plays"></ol>
+        </aside>
+        <section class="center">
+          <div id="well" class="well"><p data-i18n="well.empty"></p></div>
+          <div id="status" class="status"></div>
+          <div id="controls" class="controls"></div>
+        </section>
+        <aside class="panel">
+          <h2 data-i18n="panel.title"></h2>
+          <div id="draft"></div>
+        </aside>
+        <section class="metrics">
+          <h2 data-i18n="metrics.title"></h2>
+          <dl id="summary"></dl>
+          <div class="row">
+            <button id="export" class="btn primary" data-i18n="metrics.export"></button>
+          </div>
+        </section>
+      </main>
+      <dialog id="sheet">
+        <h2 data-i18n="keys.title"></h2>
+        <table id="sheet-table"></table>
+        <form method="dialog"><button class="btn" data-i18n="common.close"></button></form>
+      </dialog>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
