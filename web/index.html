@@ -11,7 +11,8 @@
         <h1 data-i18n="app.title"></h1>
         <form id="source" class="source">
           <label class="sr" for="url" data-i18n="source.label"></label>
-          <input id="url" type="text" autocomplete="off" data-i18n-placeholder="source.placeholder" />
+          <!-- M0 test game, prefilled so testers only press Load -->
+          <input id="url" type="text" autocomplete="off" value="https://youtu.be/bt9EBNXFCeI" data-i18n-placeholder="source.placeholder" />
           <button type="submit" class="btn" data-i18n="source.load"></button>
           <label class="btn" for="file" data-i18n="source.openFile"></label>
           <input id="file" type="file" accept="video/*" class="sr" />
