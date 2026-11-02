@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scout Analyzer — embed check</title>
+  </head>
+  <body>
+    <div id="app" style="max-width: 1100px; margin: 0 auto; padding: 24px 16px">
+      <header class="row" style="justify-content: space-between; align-items: center">
+        <h1 data-i18n="embed.title"></h1>
+        <div class="lang" role="group" data-i18n-aria="lang.label">
+          <button id="lang-en" type="button">EN</button><button id="lang-es" type="button">ES</button>
+        </div>
+      </header>
+      <p class="hint" data-i18n="embed.intro"></p>
+      <label class="field">
+        <span class="lbl" data-i18n="embed.label"></span>
+        <textarea id="links" rows="8" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface-2); color: var(--ink); font: 500 12px var(--font-mono)"></textarea>
+      </label>
+      <div class="row">
+        <button id="run" class="btn primary" data-i18n="embed.run"></button>
+        <button id="copy" class="btn" data-i18n="embed.copyCsv"></button>
+      </div>
+      <p id="summary" style="font: 700 22px var(--font-display); margin: 16px 0 8px"></p>
+      <table id="results" style="width: 100%; border-collapse: collapse; font-size: 13px"></table>
+      <div id="probe" aria-hidden="true" style="width: 320px; height: 180px; margin-top: 16px; background: var(--video-well); border-radius: 8px; overflow: hidden"></div>
+    </div>
+    <script type="module" src="/src/embedCheck.ts"></script>
+  </body>
+</html>
