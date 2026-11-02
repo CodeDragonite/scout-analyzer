@@ -17,6 +17,8 @@
           <input id="file" type="file" accept="video/*" class="sr" />
         </form>
         <div class="tools">
+          <span id="user-name" class="who"></span>
+          <button id="switch-user" type="button" class="btn ghost" data-i18n="user.switch"></button>
           <button id="help" class="btn ghost"><kbd>?</kbd> <span data-i18n="keys.title"></span></button>
           <div class="lang" role="group" data-i18n-aria="lang.label">
             <button id="lang-en" type="button">EN</button><button id="lang-es" type="button">ES</button>
@@ -43,9 +45,19 @@
           <dl id="summary"></dl>
           <div class="row">
             <button id="export" class="btn primary" data-i18n="metrics.export"></button>
+            <button id="clear" type="button" class="btn ghost" data-i18n="metrics.clear"></button>
           </div>
         </section>
       </main>
+      <dialog id="login">
+        <form id="login-form" method="dialog">
+          <h2 data-i18n="login.title"></h2>
+          <label class="field"><span class="lbl" data-i18n="login.name"></span>
+            <input id="login-name" type="text" autocomplete="nickname" maxlength="40" required /></label>
+          <p class="hint" data-i18n="login.hint"></p>
+          <button type="submit" class="btn primary" data-i18n="login.continue"></button>
+        </form>
+      </dialog>
       <dialog id="sheet">
         <h2 data-i18n="keys.title"></h2>
         <table id="sheet-table"></table>

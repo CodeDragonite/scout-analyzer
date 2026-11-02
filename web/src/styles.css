@@ -82,3 +82,5 @@ dialog table { border-collapse: collapse; width: 100%; margin-bottom: 16px; }
 dialog td { padding: 5px 8px; border-bottom: 1px solid var(--border); }
 
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+.who { color: var(--ink-muted); font-size: 13px; }
+.who:empty, .who:empty + .btn { display: none; }

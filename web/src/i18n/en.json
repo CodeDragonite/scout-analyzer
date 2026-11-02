@@ -128,5 +128,18 @@
   "embed.status.notFound": "Private or removed",
   "embed.status.invalid": "Not a YouTube link",
   "embed.status.timeout": "No answer in 12 s",
-  "embed.status.error": "Can't play"
+  "embed.status.error": "Can't play",
+
+  "login.title": "Who's tagging?",
+  "login.name": "Your name",
+  "login.hint": "Tags are saved on this computer only, after every change. No password.",
+  "login.continue": "Start tagging",
+  "user.label": "Coach: {name}",
+  "user.switch": "Switch coach",
+  "msg.restored": "Restored {n} saved plays for this video.",
+  "msg.saveFailed": "Couldn't save on this computer (storage full or blocked). Export your results now so nothing is lost.",
+  "msg.cleared": "Tags for this video cleared.",
+  "metrics.clear": "Clear tags for this video",
+  "confirm.clear": "Delete all {n} plays for this video? This can't be undone.",
+  "confirm.leave": "Some plays couldn't be saved. Leave anyway?"
 }

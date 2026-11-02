@@ -128,5 +128,18 @@
   "embed.status.notFound": "Privado o eliminado",
   "embed.status.invalid": "No es un enlace de YouTube",
   "embed.status.timeout": "Sin respuesta en 12 s",
-  "embed.status.error": "No se puede reproducir"
+  "embed.status.error": "No se puede reproducir",
+
+  "login.title": "¿Quién etiqueta?",
+  "login.name": "Tu nombre",
+  "login.hint": "Las etiquetas se guardan solo en esta computadora, después de cada cambio. Sin contraseña.",
+  "login.continue": "Empezar a etiquetar",
+  "user.label": "Entrenador: {name}",
+  "user.switch": "Cambiar entrenador",
+  "msg.restored": "Se recuperaron {n} jugadas guardadas de este video.",
+  "msg.saveFailed": "No se pudo guardar en esta computadora (almacenamiento lleno o bloqueado). Exporta tus resultados ahora para no perder nada.",
+  "msg.cleared": "Se borraron las etiquetas de este video.",
+  "metrics.clear": "Borrar etiquetas de este video",
+  "confirm.clear": "¿Borrar las {n} jugadas de este video? No se puede deshacer.",
+  "confirm.leave": "Algunas jugadas no se pudieron guardar. ¿Salir de todos modos?"
 }

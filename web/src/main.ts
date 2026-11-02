@@ -12,6 +12,7 @@ import type { PlayerAdapter, PlayerState } from "./player/PlayerAdapter";
 import { YouTubeAdapter } from "./player/YouTubeAdapter";
 import { parseYouTubeId } from "./player/youtubeUrl";
 import { newLog, summarize } from "./spike/metrics";
+import { browserStorage, createStore } from "./spike/store";
 
 type PlayType = "run" | "pass" | "rpo" | "screen" | "special";
 const PLAY_TYPES: PlayType[] = ["run", "pass", "rpo", "screen", "special"];
@@ -43,7 +44,14 @@ interface Draft {
 
 const BLANK: Situation = { quarter: 1, down: null, distance: null, goalToGo: false, yardsToGoal: null, possession: null };
 
+const store = createStore(browserStorage());
+
 const app = {
+  /** Coach name typed at the start; null until they enter it. */
+  user: store.user(),
+  /** "youtube:<id>" or "local:<fingerprint>": one saved session per coach and video. */
+  sourceKey: null as string | null,
+  saveFailed: false,
   adapter: null as PlayerAdapter | null,
   plays: [] as Play[],
   draft: null as Draft | null,
@@ -59,6 +67,37 @@ const app = {
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+
+// ---------- autosave (localStorage, M0 only) ----------
+
+/** Save after every change. A failed write shows a banner until a later save works. */
+function persist(): void {
+  if (!app.user || !app.sourceKey) return;
+  const ok = store.save(app.user, app.sourceKey, {
+    plays: app.plays,
+    draft: app.draft,
+    next: app.next,
+    side: app.side,
+    markers: app.markers,
+    log: app.log,
+  });
+  if (ok === !app.saveFailed) return;
+  app.saveFailed = !ok;
+  banner(ok ? "" : t("msg.saveFailed"));
+}
+
+function restore(sourceKey: string): number {
+  const saved = app.user ? store.load<Play, Draft>(app.user, sourceKey) : null;
+  if (!saved) return 0;
+  app.plays = saved.plays;
+  app.draft = saved.draft;
+  app.next = saved.next;
+  app.side = SIDES.includes(saved.side as Side) ? (saved.side as Side) : app.side;
+  app.markers = saved.markers;
+  app.log = saved.log;
+  app.selected = app.plays.length - 1;
+  return app.plays.length;
+}
 
 // ---------- actions ----------
 
@@ -108,6 +147,7 @@ async function timedSeek(ms: number): Promise<void> {
   if (!a) return;
   const r = await a.seek(Math.max(0, Math.min(ms, a.duration() || ms)));
   app.log.seeks.push(r);
+  persist();
   renderMetrics();
 }
 
@@ -126,6 +166,7 @@ function run(action: Action): void {
   }
   if (action === "toggleSide") {
     app.side = SIDES[(SIDES.indexOf(app.side) + 1) % SIDES.length] ?? "offense";
+    persist();
     return renderDraft();
   }
   if (action === "undo") {
@@ -134,6 +175,7 @@ function run(action: Action): void {
       app.log.playsSaved = Math.max(0, app.log.playsSaved - 1);
       app.next = { situation: last.situation, carried: last.carried };
       flash(t("msg.undone", { n: last.n }));
+      persist();
     }
     return render();
   }
@@ -175,10 +217,12 @@ function run(action: Action): void {
     }
     case "kickoff":
       app.markers.kickoffMs = a.now();
+      persist();
       return flash(t("msg.kickoff", { time: formatTimecode(a.now()) }));
     case "halftime":
       app.markers.halftimeMs = a.now();
       app.next = { situation: { ...BLANK, quarter: 3 }, carried: ["quarter"] };
+      persist();
       flash(t("msg.halftime", { time: formatTimecode(a.now()) }));
       return renderDraft();
     case "replayClip":
@@ -189,6 +233,7 @@ function run(action: Action): void {
 function ignoreMark(a: PlayerAdapter, key: "I" | "O"): boolean {
   if (!blocked(a.state())) return false;
   app.log.ignoredMarks.push({ key, atMs: a.now(), state: a.state(), wallClock: new Date().toISOString() });
+  persist();
   flash(t("msg.markIgnored", { key, state: t(`state.${a.state()}` as MessageKey) }));
   renderMetrics();
   return true;
@@ -205,9 +250,10 @@ function markSnap(a: PlayerAdapter): void {
     app.skipping = false;
     a.setRate(app.adapter?.capabilities.rates[app.rateIdx] ?? 1);
   }
-  if (app.log.firstSnapAt === null) app.log.firstSnapAt = performance.now();
+  if (app.log.firstSnapAt === null) app.log.firstSnapAt = Date.now();
   app.draft = { snapMs, endMs: null, situation: { ...app.next.situation }, carried: [...app.next.carried], playType: null };
   app.armed = true; // I arms the first tag group: digits pick play type
+  persist();
   render();
 }
 
@@ -215,6 +261,7 @@ function markWhistle(a: PlayerAdapter): void {
   if (!app.draft) return flash(t("msg.noOpenPlay"));
   if (ignoreMark(a, "O")) return;
   app.draft.endMs = a.now();
+  persist();
   renderDraft();
 }
 
@@ -224,6 +271,7 @@ function pickType(i: number): void {
   if (!type) return;
   app.draft.playType = type;
   app.armed = false;
+  persist();
   renderDraft(); // focus stays on the shell: O, R and Enter keep working
 }
 
@@ -251,6 +299,7 @@ function save(): void {
   commit(d, d.endMs ?? now, d.endMs === null, resultText);
   app.draft = null;
   app.armed = false;
+  persist();
   render();
   $("app").focus();
 }
@@ -271,7 +320,7 @@ function commit(d: Draft, endMs: number, endAuto: boolean, resultText: string): 
   app.plays.push(play);
   app.selected = app.plays.length - 1;
   app.log.playsSaved = app.plays.length;
-  app.log.lastSaveAt = performance.now();
+  app.log.lastSaveAt = Date.now();
   const parsed = resultText ? parseResult(resultText) : null;
   if (parsed) {
     const { next, carried } = carryForward(play.situation, parsed);
@@ -287,6 +336,7 @@ async function replayClip(a: PlayerAdapter): Promise<void> {
   const r = await a.playRange(Math.max(0, p.snapMs - PRE_ROLL_MS), p.endMs + POST_ROLL_MS);
   app.log.clipChecks.push(r);
   app.log.seeks.push(r.seek);
+  persist();
   flash(
     t("msg.clipChecked", {
       start: Math.round(Math.abs(r.seek.landedMs - r.startMs)),
@@ -298,20 +348,32 @@ async function replayClip(a: PlayerAdapter): Promise<void> {
 
 // ---------- loading sources ----------
 
-async function useAdapter(a: PlayerAdapter, id: string): Promise<void> {
-  app.adapter?.destroy();
-  app.adapter = a;
+function resetSession(): void {
   app.log = newLog();
   app.plays = [];
   app.draft = null;
+  app.selected = -1;
   app.next = { situation: BLANK, carried: ["quarter"] };
+  app.markers = { kickoffMs: null, halftimeMs: null };
+}
+
+async function useAdapter(a: PlayerAdapter, sourceKey: string, label: string): Promise<void> {
+  if (!app.user) return askName();
+  app.adapter?.destroy();
+  app.adapter = a;
+  app.sourceKey = sourceKey;
+  resetSession();
+  const restored = restore(sourceKey);
   app.rateIdx = a.capabilities.rates.indexOf(1);
   $("banner").textContent = "";
+  app.saveFailed = false;
   a.onState(() => renderStatus());
   a.onError((code) => banner(t(`error.${code}` as MessageKey)));
   await a.load($("well"));
-  app.log.source = { provider: a.provider, id, durationMs: a.duration() };
+  app.log.source = { provider: a.provider, id: label, durationMs: a.duration() };
+  persist();
   render();
+  if (restored) flash(t("msg.restored", { n: restored }));
   $("app").focus();
 }
 
@@ -320,19 +382,21 @@ $("source").addEventListener("submit", (e) => {
   const raw = ($("url") as HTMLInputElement).value;
   const id = parseYouTubeId(raw);
   if (!id) return banner(t("error.badLink"));
-  void useAdapter(new YouTubeAdapter(id), id).catch(() => banner(t("error.apiLoad")));
+  void useAdapter(new YouTubeAdapter(id), `youtube:${id}`, id).catch(() => banner(t("error.apiLoad")));
 });
 
 $("file").addEventListener("change", (e) => {
   const file = (e.target as HTMLInputElement).files?.[0];
   if (!file) return;
   const adapter = new LocalAdapter(file);
-  void adapter.fingerprint.then((fp) => useAdapter(adapter, `${file.name} (${fp})`));
+  // Keyed by fingerprint, so reopening the same file restores its tags.
+  void adapter.fingerprint.then((fp) => useAdapter(adapter, `local:${fp}`, `${file.name} (${fp})`));
 });
 
 // ---------- keyboard ----------
 
 window.addEventListener("keydown", (e) => {
+  if (document.querySelector("dialog[open]")) return; // login or hotkey sheet owns the keyboard
   const target = e.target as HTMLElement;
   const typing = target.tagName === "INPUT" || target.tagName === "TEXTAREA";
   if (typing) {
@@ -394,6 +458,7 @@ function applyI18n(): void {
   $("lang-en").setAttribute("aria-pressed", String(getLocale() === "en"));
   $("lang-es").setAttribute("aria-pressed", String(getLocale() === "es"));
   document.title = t("app.title");
+  $("user-name").textContent = app.user ? t("user.label", { name: app.user }) : "";
 }
 
 function renderStatus(): void {
@@ -547,6 +612,7 @@ async function copyLinks(i: number): Promise<void> {
 $("export").addEventListener("click", () => {
   const payload = {
     exportedAt: new Date().toISOString(),
+    user: app.user,
     userAgent: navigator.userAgent,
     locale: getLocale(),
     summary: summarize(app.log),
@@ -563,6 +629,52 @@ $("export").addEventListener("click", () => {
 });
 
 $("help").addEventListener("click", openSheet);
+
+// ---------- coach name (no password, M0 only) ----------
+
+function askName(): void {
+  const dlg = $("login") as HTMLDialogElement;
+  ($("login-name") as HTMLInputElement).value = "";
+  if (!dlg.open) dlg.showModal();
+}
+
+$("login").addEventListener("cancel", (e) => e.preventDefault()); // a name is required
+$("login-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const name = ($("login-name") as HTMLInputElement).value.trim();
+  if (!name) return;
+  ($("login") as HTMLDialogElement).close();
+  app.user = name;
+  // If storage is blocked, keep the name for this tab; persist() will warn on the first save.
+  store.setUser(name);
+  render();
+  $("app").focus();
+});
+
+$("switch-user").addEventListener("click", () => {
+  // Everything is already saved; reloading gives the next coach a clean screen.
+  store.signOut();
+  window.location.reload();
+});
+
+$("clear").addEventListener("click", () => {
+  if (!app.user || !app.sourceKey || !app.plays.length) return;
+  if (!window.confirm(t("confirm.clear", { n: app.plays.length }))) return;
+  store.clear(app.user, app.sourceKey);
+  const source = app.log.source;
+  resetSession();
+  app.log.source = source;
+  persist();
+  render();
+  flash(t("msg.cleared"));
+  $("app").focus();
+});
+
+window.addEventListener("beforeunload", (e) => {
+  if (!app.saveFailed || !app.plays.length) return;
+  e.preventDefault();
+  e.returnValue = t("confirm.leave");
+});
 $("lang-en").addEventListener("click", () => setLocale("en"));
 $("lang-es").addEventListener("click", () => setLocale("es"));
 onLocaleChange(render);
@@ -574,3 +686,4 @@ setInterval(() => {
 
 document.documentElement.lang = getLocale();
 render();
+if (!app.user) askName();
